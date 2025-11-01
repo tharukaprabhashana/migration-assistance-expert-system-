@@ -1,0 +1,61 @@
+{
+  "entities": {
+    "Person": {
+      "fields": {
+        "role": ["professional", "student", "dependent", "unemployed"],
+        "age": "integer",
+        "education": ["None", "Diploma", "Bachelors", "Masters", "PhD", "ProfessionalCert"],
+        "degree_field": "string",
+        "experience_years": "number",
+        "ielts": "number (0.0-9.0)",
+        "salary_usd_annual": "number",
+        "current_country": "string",
+        "preferred_country": "string",
+        "marital_status": ["single", "married", "divorced", "widowed"],
+        "has_spouse": "boolean"
+      }
+    },
+    "Spouse": {
+      "fields": {
+        "role": ["professional", "student", "unemployed"],
+        "education": ["None", "Diploma", "Bachelors", "Masters", "PhD", "ProfessionalCert"],
+        "experience_years": "number",
+        "is_working": "boolean",
+        "ielts": "number (0.0-9.0)"
+      }
+    },
+    "Child": {
+      "fields": {
+        "age": "integer",
+        "dob": "date",
+        "gender": ["male", "female", "other"]
+      }
+    },
+    "Country": {
+      "fields": {
+        "name": "string",
+        "aliases": "array[string]",
+        "languages": "array[string]",
+        "climate_tag": ["cold", "temperate", "warm", "arid", "tropical"],
+        "cost_of_living_index": "number (0-100)",
+        "typical_min_income_usd_annual": "number (approx)",
+        "common_visa_paths": "array[string]",
+        "typical_ielts_requirement": "number or string",
+        "dependent_age_limit": "integer or string",
+        "notes": "string"
+      }
+    },
+    "VisaType": {
+      "fields": {
+        "name": "string",
+        "purpose": ["work", "study", "family", "investor", "tourist", "permanent_residence"],
+        "min_education": ["None", "Diploma", "Bachelors", "Masters", "PhD"],
+        "min_ielts": "number or null",
+        "min_experience_years": "number or null",
+        "financial_requirement_usd": "number or null",
+        "points_function": "string or null (explain how points are computed)"
+      }
+    }
+  },
+  "notes": "This ontology is intentionally compact. Use it to drive Fact creation, validation and UI question prompts."
+}

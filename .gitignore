@@ -205,3 +205,55 @@ cython_debug/
 marimo/_static/
 marimo/_lsp/
 __marimo__/
+
+
+# ----------------------------------------
+# Project-specific ignores
+# ----------------------------------------
+
+# Virtual environment (redundant but explicit for your project)
+venv/
+
+# Streamlit cache and logs
+.streamlit/
+.streamlit_cache/
+logs/
+*.log
+
+# Temporary or generated JSON/data files
+*.tmp
+*.bak
+*.swp
+*.json.backup
+
+# Cache or generated ontology or static data
+ontology_cache.json
+static_kb_backup.json
+
+# Python cache
+__pycache__/
+*.py[cod]
+
+# Compiled files in subfolders
+rules/__pycache__/
+tools/__pycache__/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# IDE/project-specific (optional)
+.idea/
+.vscode/
+*.code-workspace
+
+# Jupyter checkpoints (if you experiment)
+.ipynb_checkpoints/
+
+# Local test or scratch scripts
+scratch_*.py
+test_*.py
+debug_*.py
+
+# Streamlit deployment files
+.streamlit_secrets.toml

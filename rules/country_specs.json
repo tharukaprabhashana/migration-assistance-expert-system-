@@ -1,0 +1,282 @@
+{
+  "countries": [
+    {
+      "name": "Canada",
+      "currency": "CAD",
+      "salary_threshold": 36000,
+      "ielts_required": true,
+      "ielts_strong": 7.0,
+      "ielts_medium": 6.0,
+      "group": "Anglo",
+      "occupation_bonus": {
+        "IT": 10,
+        "Engineering": 12,
+        "Healthcare": 14,
+        "Business": 8,
+        "Hospitality": 6,
+        "Research": 10
+      }
+    },
+    {
+      "name": "Australia",
+      "currency": "AUD",
+      "salary_threshold": 45000,
+      "ielts_required": true,
+      "ielts_strong": 7.5,
+      "ielts_medium": 6.5,
+      "group": "Anglo",
+      "occupation_bonus": {
+        "IT": 12,
+        "Engineering": 12,
+        "Healthcare": 15,
+        "Business": 8,
+        "Hospitality": 6,
+        "Research": 10
+      }
+    },
+    {
+      "name": "New Zealand",
+      "currency": "NZD",
+      "salary_threshold": 42000,
+      "ielts_required": true,
+      "ielts_strong": 6.5,
+      "ielts_medium": 6.0,
+      "group": "Anglo",
+      "occupation_bonus": {
+        "IT": 10,
+        "Engineering": 11,
+        "Healthcare": 13,
+        "Business": 7,
+        "Hospitality": 6,
+        "Research": 9
+      }
+    },
+    {
+      "name": "Singapore",
+      "currency": "SGD",
+      "salary_threshold": 5000,
+      "ielts_required": false,
+      "group": "Asia-Urban",
+      "occupation_bonus": {
+        "IT": 12,
+        "Engineering": 10,
+        "Healthcare": 10,
+        "Business": 12,
+        "Hospitality": 8,
+        "Research": 10
+      }
+    },
+    {
+      "name": "Japan",
+      "currency": "JPY",
+      "salary_threshold": 3000000,
+      "ielts_required": false,
+      "group": "Asia-Urban",
+      "occupation_bonus": {
+        "IT": 10,
+        "Engineering": 10,
+        "Healthcare": 8,
+        "Business": 7,
+        "Hospitality": 6,
+        "Research": 10
+      }
+    },
+    {
+      "name": "United Kingdom",
+      "currency": "GBP",
+      "salary_threshold": 25000,
+      "ielts_required": true,
+      "ielts_strong": 6.5,
+      "ielts_medium": 6.0,
+      "group": "Anglo",
+      "occupation_bonus": {
+        "IT": 12,
+        "Engineering": 10,
+        "Healthcare": 15,
+        "Business": 10,
+        "Hospitality": 6,
+        "Research": 12
+      }
+    },
+    {
+      "name": "United States",
+      "currency": "USD",
+      "salary_threshold": 40000,
+      "ielts_required": false,
+      "group": "Anglo",
+      "occupation_bonus": {
+        "IT": 12,
+        "Engineering": 12,
+        "Healthcare": 15,
+        "Business": 10,
+        "Hospitality": 6,
+        "Research": 15
+      }
+    },
+    {
+      "name": "Germany",
+      "currency": "EUR",
+      "salary_threshold": 50000,
+      "ielts_required": false,
+      "group": "Schengen",
+      "occupation_bonus": {
+        "IT": 12,
+        "Engineering": 14,
+        "Healthcare": 12,
+        "Business": 10,
+        "Hospitality": 6,
+        "Research": 12
+      }
+    },
+    {
+      "name": "Netherlands",
+      "currency": "EUR",
+      "salary_threshold": 38000,
+      "ielts_required": false,
+      "group": "Schengen",
+      "occupation_bonus": {
+        "IT": 12,
+        "Engineering": 12,
+        "Healthcare": 10,
+        "Business": 12,
+        "Hospitality": 6,
+        "Research": 11
+      }
+    },
+    {
+      "name": "France",
+      "currency": "EUR",
+      "salary_threshold": 32000,
+      "ielts_required": false,
+      "group": "Schengen",
+      "occupation_bonus": {
+        "IT": 10,
+        "Engineering": 10,
+        "Healthcare": 10,
+        "Business": 9,
+        "Hospitality": 7,
+        "Research": 12
+      }
+    },
+    {
+      "name": "Italy",
+      "currency": "EUR",
+      "salary_threshold": 30000,
+      "ielts_required": false,
+      "group": "Schengen",
+      "occupation_bonus": {
+        "IT": 8,
+        "Engineering": 10,
+        "Healthcare": 8,
+        "Business": 7,
+        "Hospitality": 8,
+        "Research": 10
+      }
+    },
+    {
+      "name": "Norway",
+      "currency": "NOK",
+      "salary_threshold": 450000,
+      "ielts_required": false,
+      "group": "Nordic",
+      "occupation_bonus": {
+        "IT": 12,
+        "Engineering": 12,
+        "Healthcare": 12,
+        "Business": 10,
+        "Hospitality": 7,
+        "Research": 11
+      }
+    },
+    {
+      "name": "Finland",
+      "currency": "EUR",
+      "salary_threshold": 35000,
+      "ielts_required": false,
+      "group": "Nordic",
+      "occupation_bonus": {
+        "IT": 11,
+        "Engineering": 11,
+        "Healthcare": 10,
+        "Business": 10,
+        "Hospitality": 6,
+        "Research": 12
+      }
+    },
+    {
+      "name": "Sweden",
+      "currency": "SEK",
+      "salary_threshold": 350000,
+      "ielts_required": false,
+      "group": "Nordic",
+      "occupation_bonus": {
+        "IT": 11,
+        "Engineering": 11,
+        "Healthcare": 10,
+        "Business": 10,
+        "Hospitality": 6,
+        "Research": 11
+      }
+    },
+    {
+      "name": "Denmark",
+      "currency": "DKK",
+      "salary_threshold": 330000,
+      "ielts_required": false,
+      "group": "Nordic",
+      "occupation_bonus": {
+        "IT": 11,
+        "Engineering": 12,
+        "Healthcare": 11,
+        "Business": 10,
+        "Hospitality": 6,
+        "Research": 10
+      }
+    },
+    {
+      "name": "Latvia",
+      "currency": "EUR",
+      "salary_threshold": 18000,
+      "ielts_required": false,
+      "group": "Schengen",
+      "occupation_bonus": {
+        "IT": 8,
+        "Engineering": 9,
+        "Healthcare": 8,
+        "Business": 7,
+        "Hospitality": 6,
+        "Research": 8
+      }
+    },
+    {
+      "name": "Saudi Arabia",
+      "currency": "SAR",
+      "salary_threshold": 60000,
+      "ielts_required": false,
+      "group": "Gulf",
+      "occupation_bonus": {
+        "IT": 10,
+        "Engineering": 10,
+        "Healthcare": 12,
+        "Business": 8,
+        "Hospitality": 12,
+        "Research": 7
+      }
+    },
+    {
+      "name": "United Arab Emirates",
+      "currency": "AED",
+      "salary_threshold": 60000,
+      "ielts_required": false,
+      "group": "Gulf",
+      "occupation_bonus": {
+        "IT": 10,
+        "Engineering": 10,
+        "Healthcare": 10,
+        "Business": 10,
+        "Hospitality": 12,
+        "Research": 8
+      }
+    }
+  ]
+}
