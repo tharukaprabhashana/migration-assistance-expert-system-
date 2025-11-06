@@ -552,7 +552,7 @@ def format_results_natural(results: Dict[str, Any], state: PersonSlots, show_alt
         "You are a friendly migration consultant. Based on KNOWN FACTS and ENGINE RESULTS, "
         "explain the applicant's situation and next steps in plain English. Keep it concise: "
         "4–6 sentences or short bullets. Include: eligibility status (if any), key reasons, points/bonuses, "
-        "effects of spouse/children if relevant, and 2–3 alternative countries if provided. "
+        "effects of spouse/children if relevant. If alternatives are provided, include the top 2–3 and add 1–2 short reasons per alternative. "
         "Avoid raw arrays, tuples, or bracketed data. Do not invent facts."
     )
 

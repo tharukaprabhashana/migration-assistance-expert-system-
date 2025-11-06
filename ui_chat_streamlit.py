@@ -209,10 +209,20 @@ if prompt:
         # Prefer formatted natural message; fallback to raw summary
         if not formatted:
             try:
-                formatted = call_backend_format(results, st.session_state.slots.dict(), show_alternatives=show_alts)
+                # Ask backend to compute data-driven alternatives when allowed
+                formatted = call_backend_format(
+                    results,
+                    st.session_state.slots.dict(),
+                    show_alternatives=show_alts,
+                )
             except Exception:
                 try:
-                    formatted = format_results_natural(results, st.session_state.slots, show_alternatives=show_alts)
+                    # Local fallback: best-effort natural formatting without advisor enrichment
+                    formatted = format_results_natural(
+                        results,
+                        st.session_state.slots,
+                        show_alternatives=show_alts,
+                    )
                 except Exception:
                     formatted = ""
         final_msg = formatted or summarize_results(results)

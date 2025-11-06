@@ -6,6 +6,7 @@ from fastapi import FastAPI
 from pydantic import BaseModel
 
 from chat_agent import PersonSlots, extract_and_plan, chat_turn, format_results_natural
+from advisor.alternative_advisor import suggest_alternatives
 from engine import MigrationEngine
 
 # Configure logging
@@ -87,6 +88,7 @@ class FormatRequest(BaseModel):
     results: Dict[str, Any]
     state: Dict[str, Any] | None = None
     show_alternatives: bool = True
+    compute_alternatives: bool = True
 
 
 class FormatResponse(BaseModel):
@@ -98,7 +100,17 @@ async def api_format_results(req: FormatRequest) -> FormatResponse:
     logger.info("/format_results called")
     try:
         state = PersonSlots(**(req.state or {}))
-        msg = format_results_natural(req.results, state, show_alternatives=req.show_alternatives)
+        # Optionally compute data-driven alternatives before formatting
+        results = dict(req.results)
+        if req.show_alternatives and req.compute_alternatives:
+            try:
+                alts = suggest_alternatives(state.dict())
+                if alts:
+                    results["alternative_suggestions"] = [a["name"] for a in alts]
+                    results["alternative_reasons"] = alts
+            except Exception as e:
+                logger.warning("suggest_alternatives failed: %s", e)
+        msg = format_results_natural(results, state, show_alternatives=req.show_alternatives)
         return FormatResponse(message=msg)
     except Exception as e:
         logger.exception("format_results failed")
