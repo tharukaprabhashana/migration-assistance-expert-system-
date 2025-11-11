@@ -52,6 +52,7 @@ class PersonSlots:
     ielts: Optional[float] = None
     salary_local: Optional[int] = None
     salary_currency: Optional[str] = None
+    salary_estimated: Optional[bool] = None
     current_country: Optional[str] = None
     preferred_country: Optional[str] = None
     marital_status: Optional[str] = None
@@ -91,13 +92,18 @@ class PersonSlots:
         return self
 
     def is_complete(self) -> bool:
+        # Base required fields for all roles
         required = [
-            "role", "age", "education", "degree_field", "occupation",
-            "experience_years", "current_country", "preferred_country",
-            "marital_status", "salary_local",
+            "role", "age", "education", "degree_field",
+            "current_country", "preferred_country", "marital_status",
         ]
+        # For non-students, include work/financial fields
+        if (self.role or "").lower() != "student":
+            required.extend(["occupation", "experience_years", "salary_local"])
+        # IELTS only if destination requires
         if requires_ielts(self.preferred_country):
             required.append("ielts")
+        # Spouse details only if married
         if (self.marital_status or "").lower() == "married":
             required.extend(["has_spouse", "spouse_education", "spouse_is_working", "num_children"])
         return all(getattr(self, k) is not None for k in required)
@@ -308,7 +314,9 @@ CONV_SYSTEM_PROMPT = (
     "Ask at most ONE concise, human question per turn ONLY about fields listed in MISSING_FIELDS. "
     "Never ask about anything not in MISSING_FIELDS. Never repeat the same question twice in a row. If you just asked about a field and the user didn't answer, pick a different missing field or rephrase. "
     "Never assume marital status; only set it when the user explicitly states it. If unknown and listed in MISSING_FIELDS, ask about it. "
-    "If MISSING_FIELDS is empty, DO NOT ask questions — acknowledge succinctly and confirm you'll run the assessment. "
+    "If the user is a student, avoid asking about work experience or salary unless they offer it. "
+    "If PRIORITY_FIELDS are provided, prefer asking about those before other fields. "
+    "If the user says they don't know their expected salary, offer to estimate a typical salary based on country and role; if they agree, proceed with an estimate and move on. "
     "Skip IELTS questions unless the preferred country requires IELTS (Canada, Australia, New Zealand, United Kingdom). "
     "If the user is single or divorced, avoid spouse questions. If married, you may ask briefly about spouse education and employment. "
     "Your goal is to help the user complete their profile so an expert system can evaluate eligibility. "
@@ -317,14 +325,15 @@ CONV_SYSTEM_PROMPT = (
 
 
 def _missing_fields_for(state: PersonSlots) -> List[str]:
-    """Return the list of missing keys given current state and policy (IELTS/spouse)."""
+    """Return missing keys (role-aware). Students skip occupation/experience/salary unless volunteered."""
     required = [
-        "role", "age", "education", "degree_field", "occupation",
-        "experience_years", "current_country", "preferred_country", "marital_status",
+        "role", "age", "education", "degree_field",
+        "current_country", "preferred_country", "marital_status",
     ]
+    if (state.role or "").lower() != "student":
+        required.extend(["occupation", "experience_years", "salary_local"])
     if requires_ielts(state.preferred_country):
         required.append("ielts")
-    required.append("salary_local")
     if (state.marital_status or "").lower() == "married":
         required.extend(["spouse_education", "spouse_is_working", "num_children"])
     return [k for k in required if getattr(state, k) is None]
@@ -351,6 +360,12 @@ def chat_generate_reply(history: List[Dict[str, str]], state: PersonSlots) -> st
     missing = _missing_fields_for(state)
     missing_text = ", ".join(missing) if missing else "(none)"
 
+    # Priority: if IELTS is required and missing, strongly prioritize it
+    priority: List[str] = []
+    if requires_ielts(state.preferred_country) and state.ielts is None:
+        priority.append("ielts")
+    priority_text = ", ".join(priority) if priority else "(none)"
+
     # Convert history to a simple transcript for context
     transcript = []
     for m in history[-12:]:  # limit context
@@ -361,7 +376,8 @@ def chat_generate_reply(history: List[Dict[str, str]], state: PersonSlots) -> st
 
     prompt = (
         f"SYSTEM:\n{CONV_SYSTEM_PROMPT}\n\n"
-        f"MISSING_FIELDS: {missing_text}\n\n"
+        f"MISSING_FIELDS: {missing_text}\n"
+        f"PRIORITY_FIELDS: {priority_text}\n\n"
         f"KNOWN FACTS:\n{facts}\n\n"
         f"RECENT CONVERSATION:\n{transcript_text}\n\n"
         "ASSISTANT: Respond naturally based on the conversation, KNOWN FACTS, and MISSING_FIELDS."
@@ -383,6 +399,28 @@ def chat_turn(user_text: str, state: PersonSlots, history: List[Dict[str, str]])
     extracted = llm_extract(user_text, missing_fields=missing_before, last_question=last_q)
     merged = state.merge(extracted)
     merged = derive(merged)
+
+    # 1.5) If user indicates unknown salary and it's missing, estimate it
+    try:
+        ut_low = user_text.lower()
+    except Exception:
+        ut_low = ""
+    unknown_salary = (
+        merged.salary_local is None and any(p in ut_low for p in [
+            "don't know", "dont know", "not sure", "no idea", "you add", "add salary", "estimate", "approx", "average salary"
+        ])
+    )
+    if unknown_salary and merged.preferred_country:
+        try:
+            from advisor.alternative_advisor import estimate_salary
+            est = estimate_salary(merged.dict())
+            if est:
+                merged.salary_local = int(est)
+                if not merged.salary_currency and merged.preferred_country:
+                    merged.salary_currency = COUNTRY_TO_CURRENCY.get(merged.preferred_country)
+                merged.salary_estimated = True
+        except Exception:
+            pass
 
     # 2) Let LLM decide what to say next (no ordered questioning)
     next_msg = chat_generate_reply(history + [{"role": "user", "content": user_text}], merged)
@@ -553,6 +591,7 @@ def format_results_natural(results: Dict[str, Any], state: PersonSlots, show_alt
         "explain the applicant's situation and next steps in plain English. Keep it concise: "
         "4–6 sentences or short bullets. Include: eligibility status (if any), key reasons, points/bonuses, "
         "effects of spouse/children if relevant. If alternatives are provided, include the top 2–3 and add 1–2 short reasons per alternative. "
+        "If salary_estimated is true, briefly note that an estimated salary was assumed for assessment. "
         "Avoid raw arrays, tuples, or bracketed data. Do not invent facts."
     )
 
