@@ -173,3 +173,81 @@ def suggest_alternatives(
         {"name": name, "score": score, "reasons": reasons}
         for name, score, reasons in top
     ]
+
+
+def estimate_salary(
+    person: Dict[str, Any],
+    country_specs_path: Optional[str] = None,
+    static_kb_path: Optional[str] = None,
+    rates_to_usd: Optional[Dict[str, float]] = None,
+) -> Optional[int]:
+    """Estimate an annual salary in the preferred country's local currency.
+    Heuristic: start from static_kb typical_min_income_usd_annual, adjust by occupation bonus,
+    education, and experience. Convert to target currency. Returns an int (rounded to nearest 1000).
+    """
+    specs = load_country_specs(country_specs_path)
+    kb = load_static_kb(static_kb_path)
+    rates = rates_to_usd or RATES_TO_USD
+
+    preferred = person.get("preferred_country")
+    if not preferred:
+        return None
+    cand = specs.get(preferred) or {}
+    target_cur = cand.get("currency")
+    if not target_cur:
+        return None
+
+    # Find base USD income for that country from static_kb
+    base_usd: Optional[float] = None
+    for c in kb.get("countries", []):
+        if c.get("name") == preferred:
+            try:
+                base_usd = float(c.get("typical_min_income_usd_annual"))
+            except Exception:
+                base_usd = None
+            break
+    if base_usd is None:
+        # fallback: take a generic base
+        base_usd = 28000.0
+
+    # Adjustments
+    occupation = person.get("occupation")
+    occ_cat = derive_occupation_category(occupation)
+    bonus_pct = 0.0
+    if occ_cat:
+        bonus_map = cand.get("occupation_bonus") or {}
+        # scale bonus (e.g., +12 -> +9%)
+        raw = 0
+        for k, v in bonus_map.items():
+            if k.lower() == occ_cat.lower():
+                try:
+                    raw = int(v)
+                except Exception:
+                    raw = 0
+                break
+        bonus_pct += 0.0075 * raw  # 0.75% per bonus point
+
+    edu = (person.get("education") or "").lower()
+    if "phd" in edu:
+        bonus_pct += 0.20
+    elif "master" in edu:
+        bonus_pct += 0.12
+    elif "bachelor" in edu:
+        bonus_pct += 0.05
+
+    try:
+        exp = int(person.get("experience_years") or 0)
+    except Exception:
+        exp = 0
+    bonus_pct += min(0.02 * max(0, exp), 0.20)  # up to +20% for experience
+
+    adj_usd = base_usd * (1.0 + bonus_pct)
+    # Convert USD -> local currency
+    amount_local = convert(adj_usd, "USD", target_cur, rates)
+    if amount_local is None:
+        return None
+    # Round to nearest 1000
+    try:
+        return int(round(amount_local / 1000.0) * 1000)
+    except Exception:
+        return int(amount_local)
